@@ -17,7 +17,7 @@ BaselineOfFASTRefactor >> baseline: spec [
 { #category : #baselines }
 BaselineOfFASTRefactor >> dependencies: spec [
 
-	spec baseline: 'FAST-JAVA' with: [ "transitively loads FAST" 
+	spec baseline: 'FASTJava' with: [ "transitively loads FAST" 
 		spec repository: 'github://moosetechnology/FAST-JAVA:v3/src' ]
 ]
 
@@ -26,7 +26,7 @@ BaselineOfFASTRefactor >> groups: spec [
 
 	spec
 		group: 'default' with: #( 'core' 'tests' );
-		group: 'core' with: #( 'FAST-JAVA' 'FASTRefactor' );
+		group: 'core' with: #( 'FASTJava' 'FASTRefactor' );
 		group: 'tests' with: 'FASTRefactor-Tests'
 ]
 
