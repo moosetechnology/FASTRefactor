@@ -28,6 +28,30 @@ FASTRefactor class >> on: aFASTModel [
 	^ self new model: aFASTModel
 ]
 
+{ #category : #'ast manipulation' }
+FASTRefactor >> add: newNode after: aNode [
+
+	"Add newNode after aNode in the parent container of aNode.
+	Fail if aNode is not in a to-many relationship with its parent."
+
+	self parentOf: aNode nodeAndRelationDo: [ :parent :relation | 
+		(parent perform: relation opposite implementingSelector)
+			add: newNode
+			after: aNode ]
+]
+
+{ #category : #'ast manipulation' }
+FASTRefactor >> add: newNode before: aNode [
+
+	"Add newNode before aNode in the parent container of aNode.
+	Fail if aNode is not in a to-many relationship with its parent."
+
+	self parentOf: aNode nodeAndRelationDo: [ :parent :relation | 
+		(parent perform: relation opposite implementingSelector)
+			add: newNode
+			before: aNode ]
+]
+
 { #category : #enumerating }
 FASTRefactor >> childrenOf: aNode nodeAndRelationDo: aBlock [
 

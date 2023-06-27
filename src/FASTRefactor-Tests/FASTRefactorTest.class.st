@@ -39,6 +39,34 @@ FASTRefactorTest >> setUp [
 ]
 
 { #category : #tests }
+FASTRefactorTest >> testAddAfter [
+
+	| newNode |
+	newNode := model newNullLiteral.
+
+	refactor add: newNode after: varExpr.
+	self assert: (model includes: newNode).
+	self assert: newNode argumentOwner equals: invocation.
+	self assert: (invocation arguments at: 2) equals: newNode.
+	self assert: (invocation arguments at: 1) equals: varExpr.
+	self assert: invocation arguments size equals: 3
+]
+
+{ #category : #tests }
+FASTRefactorTest >> testAddBefore [
+
+	| newNode |
+	newNode := model newNullLiteral.
+
+	refactor add: newNode before: varExpr.
+	self assert: (model includes: newNode).
+	self assert: newNode argumentOwner equals: invocation.
+	self assert: (invocation arguments at: 1) equals: newNode.
+	self assert: (invocation arguments at: 2) equals: varExpr.
+	self assert: invocation arguments size equals: 3
+]
+
+{ #category : #tests }
 FASTRefactorTest >> testRemoveNode [
 
 	"Once a node is removed, verify that:
