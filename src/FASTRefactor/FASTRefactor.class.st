@@ -28,6 +28,17 @@ FASTRefactor class >> on: aFASTModel [
 	^ self new model: aFASTModel
 ]
 
+{ #category : #enumerating }
+FASTRefactor >> childrenOf: aNode nodeAndRelationDo: aBlock [
+
+	"Evaluate a block with each child node and aNode's relation to it as arguments."
+
+	(self propertiesOf: aNode) do: [ :property | 
+		property isChildrenProperty and: [ 
+			(aNode perform: property implementingSelector) ifNotNil: [ :child | 
+				aBlock value: child value: property ] ] ]
+]
+
 { #category : #initialization }
 FASTRefactor >> initialize [
 
@@ -64,18 +75,30 @@ FASTRefactor >> model: aFASTModel [
 	model := aFASTModel
 ]
 
-{ #category : #caching }
+{ #category : #enumerating }
+FASTRefactor >> parentOf: aNode nodeAndRelationDo: aBlock [
+
+	"Evaluate a block with the parent node and aNode's relation to it as arguments.
+	Stop at first found because there is only one parent in a tree."
+
+	(self propertiesOf: aNode) do: [ :property | 
+		property isContainer and: [ 
+			(aNode perform: property implementingSelector) ifNotNil: [ :parent | 
+				^ aBlock value: parent value: property ] ] ]
+]
+
+{ #category : #enumerating }
 FASTRefactor >> propertiesOf: aNode [
 
 	^ propertyCache
 		  at: aNode class
-		  ifAbsentPut: [ aNode allDeclaredPropertiesIn: aNode metamodel ]
+		  ifAbsentPut: [ aNode allDeclaredProperties ]
 ]
 
 { #category : #'ast manipulation' }
 FASTRefactor >> removeNode: aNode [
 
-	"Completely remove an entity from its model and relations."
+	"Completely remove a node from its model and relations."
 
 	(self propertiesOf: aNode)
 		select: [ :relation | relation hasOpposite ]
@@ -94,36 +117,30 @@ FASTRefactor >> removeTree: aNode [
 
 	"Recursively remove a node and all its children from the model."
 
-	(self propertiesOf: aNode)
-		select: [ :relation | relation isChildrenProperty ]
-		thenDo: [ :relation | 
-			(aNode perform: relation implementingSelector) ifNotNil: [ :child | 
-				child isCollection
-					ifTrue: [ 
-						child ifNotEmpty: [ "make an array copy to remove elements during iteration" 
-							child asArray do: [ :node | self removeTree: node ] ] ]
-					ifFalse: [ self removeTree: child ] ] ].
+	self childrenOf: aNode nodeAndRelationDo: [ :child :relation | 
+		child isCollection
+			ifTrue: [ 
+				child ifNotEmpty: [ "make an array copy to remove elements during iteration" 
+					child asArray do: [ :node | self removeTree: node ] ] ]
+			ifFalse: [ self removeTree: child ] ].
 	self removeNode: aNode
 ]
 
 { #category : #'ast manipulation' }
-FASTRefactor >> replace: aNode with: anotherNode [
+FASTRefactor >> replace: aNode with: newNode [
 
-	"Replace an AST node with another in the same location."
+	"Replace a node with a new one in the same location."
 
-	(self propertiesOf: aNode)
-		select: [ :relation | relation isContainer ]
-		thenDo: [ :relation | 
-			(aNode perform: relation implementingSelector) ifNotNil: [ :parent | 
-				relation opposite isMultivalued
-					ifTrue: [ 
-						(parent perform: relation opposite implementingSelector)
-							replace: aNode
-							with: anotherNode ]
-					ifFalse: [ 
-						aNode perform: relation implementingSelector asMutator with: nil.
-						parent
-							perform: relation opposite implementingSelector asMutator
-							with: anotherNode ] ] ].
-	self removeNode: aNode
+	self parentOf: aNode nodeAndRelationDo: [ :parent :relation | 
+		relation opposite isMultivalued
+			ifTrue: [ "replace at same index"
+				(parent perform: relation opposite implementingSelector)
+					replace: aNode
+					with: newNode ]
+			ifFalse: [ 
+				aNode perform: relation implementingSelector asMutator with: nil.
+				parent
+					perform: relation opposite implementingSelector asMutator
+					with: newNode ] ].
+	self removeTree: aNode
 ]

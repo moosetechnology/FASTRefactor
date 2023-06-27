@@ -41,6 +41,11 @@ FASTRefactorTest >> setUp [
 { #category : #tests }
 FASTRefactorTest >> testRemoveNode [
 
+	"Once a node is removed, verify that:
+	- model does not include it anymore
+	- only one node is removed from the model
+	- node is cut off from all relations"
+
 	| size |
 	size := model size.
 
@@ -48,11 +53,19 @@ FASTRefactorTest >> testRemoveNode [
 	refactor removeNode: literal.
 	self deny: (model includes: literal).
 	self assert: model size equals: size - 1.
+	self assert:
+		((literal allDeclaredProperties select: #hasOpposite) allSatisfy: [ 
+			 :relation | 
+			 (literal perform: relation implementingSelector) isEmptyOrNil ]).
 
 	"Can remove entity in a multivalued slot"
 	refactor removeNode: varExpr.
 	self deny: (model includes: varExpr).
-	self assert: model size equals: size - 2
+	self assert: model size equals: size - 2.
+	self assert:
+		((varExpr allDeclaredProperties select: #hasOpposite) allSatisfy: [ 
+			 :relation | 
+			 (varExpr perform: relation implementingSelector) isEmptyOrNil ])
 ]
 
 { #category : #tests }
