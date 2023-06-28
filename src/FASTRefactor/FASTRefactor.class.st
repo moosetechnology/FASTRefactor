@@ -130,6 +130,16 @@ FASTRefactor >> model: aFASTModel [
 ]
 
 { #category : #enumerating }
+FASTRefactor >> parentNodeOf: aNode [
+
+	"Faster than FASTTEntity>>parentNode."
+
+	^ self
+		  parentOf: aNode
+		  nodeAndRelationDo: [ :parent :relation | parent ]
+]
+
+{ #category : #enumerating }
 FASTRefactor >> parentOf: aNode nodeAndRelationDo: aBlock [
 
 	"Evaluate a block with the parent node and aNode's relation to it as arguments.
@@ -138,7 +148,8 @@ FASTRefactor >> parentOf: aNode nodeAndRelationDo: aBlock [
 	(self propertiesOf: aNode) do: [ :property | 
 		property isContainer and: [ 
 			(aNode perform: property implementingSelector) ifNotNil: [ :parent | 
-				^ aBlock value: parent value: property ] ] ]
+				^ aBlock value: parent value: property ] ] ].
+	^ nil
 ]
 
 { #category : #enumerating }
