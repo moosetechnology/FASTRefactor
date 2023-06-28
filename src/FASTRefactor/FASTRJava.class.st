@@ -21,7 +21,7 @@ FASTRJava >> inlineLiteralsIn: aFASTJavaMethodEntity [
 			name := (variable := decl variable) name.
 			varExprs
 				select: [ :var | var ~= variable and: [ var name = name ] ]
-				thenDo: [ :var | self replace: var with: expr copy ].
+				thenDo: [ :var | self replace: var with: (self copyLeaf: expr) ].
 			self removeVariableDeclaration: decl ]
 ]
 

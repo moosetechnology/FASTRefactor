@@ -63,6 +63,36 @@ FASTRefactor >> childrenOf: aNode nodeAndRelationDo: aBlock [
 				aBlock value: child value: property ] ] ]
 ]
 
+{ #category : #copying }
+FASTRefactor >> copyLeaf: aNode [
+
+	"Return a copy of aNode with a new ID and properly added to its model.
+	Do not implement the `postCopy` hook because we are dealing with tree structures, so this is not generalizable to all models in the Moose framework."
+
+	^ aNode copy initialize mooseModel: aNode mooseModel
+]
+
+{ #category : #copying }
+FASTRefactor >> copyTree: aNode [
+
+	"Copy aNode and all its children recursively."
+
+	| newNode |
+	newNode := self copyLeaf: aNode.
+	self childrenOf: aNode nodeAndRelationDo: [ :child :relation | 
+		child isCollection
+			ifTrue: [ 
+				child ifNotEmpty: [ 
+					newNode
+						perform: relation implementingSelector asMutator
+						with: (child collect: [ :node | self copyTree: node ]) ] ]
+			ifFalse: [ 
+				newNode
+					perform: relation implementingSelector asMutator
+					with: (self copyTree: child) ] ].
+	^ newNode
+]
+
 { #category : #initialization }
 FASTRefactor >> initialize [
 
