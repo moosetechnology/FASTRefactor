@@ -144,6 +144,10 @@ FASTRefactor >> parentOf: aNode nodeAndRelationDo: aBlock [
 { #category : #enumerating }
 FASTRefactor >> propertiesOf: aNode [
 
+	"Iterate over the properties of aNode in a metamodel-agnostic manner.
+	Properties include both direct properties (attributes) and relationships.
+	Since this is used often, the result is cached for performance."
+
 	^ propertyCache
 		  at: aNode class
 		  ifAbsentPut: [ aNode allDeclaredProperties ]

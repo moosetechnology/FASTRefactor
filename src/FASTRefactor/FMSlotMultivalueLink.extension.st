@@ -15,8 +15,9 @@ FMSlotMultivalueLink >> add: newEntity before: entity [
 ]
 
 { #category : #'*FASTRefactor' }
-FMSlotMultivalueLink >> replace: anEntity with: anotherEntity [
+FMSlotMultivalueLink >> replace: oldEntity with: newEntity [
 
-	slot remove: anEntity from: owner.
-	values at: (values indexOf: anEntity) put: anotherEntity
+	slot remove: oldEntity from: owner.
+	slot add: newEntity to: owner.
+	values at: (values indexOf: oldEntity) put: newEntity
 ]
