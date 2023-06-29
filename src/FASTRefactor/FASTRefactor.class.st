@@ -117,6 +117,18 @@ FASTRefactor >> inlineLiteralsIn: aFASTTBehaviouralEntity [
 	self subclassResponsibility
 ]
 
+{ #category : #testing }
+FASTRefactor >> isRedundantSetter: invoc [
+
+	"Setting a value which is equals to the default value is redundant."
+
+	| argument |
+	^ invoc arguments size = 1 and: [ 
+		  (argument := invoc arguments first) isLiteral and: [ 
+			  argument isDefaultValue and: [ 
+				  invoc famixInvocation anyCandidate isSetter ] ] ]
+]
+
 { #category : #accessing }
 FASTRefactor >> model [
 
@@ -179,6 +191,18 @@ FASTRefactor >> removeNode: aNode [
 							 ifTrue: [ #(  ) ]
 							 ifFalse: [ nil ]) ] ].
 	model ifNotNil: [ model remove: aNode ]
+]
+
+{ #category : #'ast transformation' }
+FASTRefactor >> removeRedundantSetters [
+
+	"Uninitialized variables have a default value, so it is redundant to use a setter with the default value as an argument.
+	To work correctly, the invocations should be bound to the called method in a Famix model."
+
+	(model allUsing: FASTTInvocation)
+		select: [ :invoc | self isRedundantSetter: invoc ]
+		thenDo: [ :invoc | "Remove the statement containing the setter expression." 
+			self removeTree: (self parentNodeOf: invoc) ]
 ]
 
 { #category : #'ast manipulation' }

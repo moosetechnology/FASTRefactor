@@ -20,9 +20,21 @@ FASTRJava >> inlineLiteralsIn: aFASTJavaMethodEntity [
 			| variable name |
 			name := (variable := decl variable) name.
 			varExprs
-				select: [ :var | var ~= variable and: [ var name = name ] ]
+				select: [ :var | var ~~ variable and: [ var name = name ] ]
 				thenDo: [ :var | self replace: var with: (self copyLeaf: expr) ].
 			self removeVariableDeclaration: decl ]
+]
+
+{ #category : #testing }
+FASTRJava >> isRedundantSetter: invoc [
+
+	"Objects such as Integer, Long, Float, etc. can be initialized with a literal, but their default value is null."
+
+	| argument |
+	^ (super isRedundantSetter: invoc) and: [ 
+		  (argument := invoc arguments first) isNullLiteral or: [ 
+			  invoc famixInvocation anyCandidate parameters first declaredType
+				  isPrimitiveType ] ]
 ]
 
 { #category : #'ast transformation' }
