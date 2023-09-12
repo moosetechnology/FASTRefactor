@@ -67,6 +67,25 @@ FASTRefactorTest >> testAddBefore [
 ]
 
 { #category : #tests }
+FASTRefactorTest >> testCopyLeaf [
+
+	| copy value |
+	{ literal. varExpr } do: [ :node | 
+		copy := refactor copyLeaf: node.
+		self assert: copy class equals: node class.
+		self deny: copy equals: node.
+		(refactor propertiesOf: copy) do: [ :property | 
+			(property mmClass package name beginsWith: 'FAST') ifTrue: [ 
+				value := copy perform: property implementingSelector.
+				property hasOpposite
+					ifTrue: [ self assert: value isEmptyOrNil ]
+					ifFalse: [ 
+						self
+							assert: value
+							equals: (node perform: property implementingSelector) ] ] ] ]
+]
+
+{ #category : #tests }
 FASTRefactorTest >> testRemoveNode [
 
 	"Once a node is removed, verify that:
@@ -100,7 +119,8 @@ FASTRefactorTest >> testRemoveNode [
 FASTRefactorTest >> testRemoveTree [
 
 	refactor removeTree: method.
-	self assert: model isEmpty
+	self assert: method mooseModel isNil.
+	self assertEmpty: model
 ]
 
 { #category : #tests }

@@ -34,7 +34,7 @@ FASTRefactor >> add: newNode after: aNode [
 	"Add newNode after aNode in the parent container of aNode.
 	Fail if aNode is not in a to-many relationship with its parent."
 
-	self parentOf: aNode nodeAndRelationDo: [ :parent :relation | 
+	self parentOf: aNode withRelationDo: [ :parent :relation | 
 		(parent perform: relation opposite implementingSelector)
 			add: newNode
 			after: aNode ]
@@ -46,19 +46,19 @@ FASTRefactor >> add: newNode before: aNode [
 	"Add newNode before aNode in the parent container of aNode.
 	Fail if aNode is not in a to-many relationship with its parent."
 
-	self parentOf: aNode nodeAndRelationDo: [ :parent :relation | 
+	self parentOf: aNode withRelationDo: [ :parent :relation | 
 		(parent perform: relation opposite implementingSelector)
 			add: newNode
 			before: aNode ]
 ]
 
 { #category : #enumerating }
-FASTRefactor >> childrenOf: aNode nodeAndRelationDo: aBlock [
+FASTRefactor >> childrenOf: aNode withRelationDo: aBlock [
 
 	"Evaluate a block with each child node and aNode's relation to it as arguments."
 
 	(self propertiesOf: aNode) do: [ :property | 
-		property isChildrenProperty and: [ 
+		property isChildrenProperty ifTrue: [ 
 			(aNode perform: property implementingSelector) ifNotNil: [ :child | 
 				aBlock value: child value: property ] ] ]
 ]
@@ -69,7 +69,17 @@ FASTRefactor >> copyLeaf: aNode [
 	"Return a copy of aNode with a new ID and properly added to its model.
 	Do not implement the `postCopy` hook because we are dealing with tree structures, so this is not generalizable to all models in the Moose framework."
 
-	^ aNode copy initialize mooseModel: aNode mooseModel
+	| newNode |
+	newNode := self privateCopy: aNode.
+	(self propertiesOf: aNode)
+		select: [ :property | 
+		property isDerived not and: [ property opposite isNil ] ]
+		thenDo: [ :property | 
+			(aNode perform: property implementingSelector) ifNotNil: [ :value | 
+				newNode
+					perform: property implementingSelector asMutator
+					with: value copy ] ].
+	^ newNode
 ]
 
 { #category : #copying }
@@ -78,8 +88,8 @@ FASTRefactor >> copyTree: aNode [
 	"Copy aNode and all its children recursively."
 
 	| newNode |
-	newNode := self copyLeaf: aNode.
-	self childrenOf: aNode nodeAndRelationDo: [ :child :relation | 
+	newNode := self privateCopy: aNode.
+	self childrenOf: aNode withRelationDo: [ :child :relation | 
 		child isCollection
 			ifTrue: [ 
 				child ifNotEmpty: [ 
@@ -144,24 +154,28 @@ FASTRefactor >> model: aFASTModel [
 { #category : #enumerating }
 FASTRefactor >> parentNodeOf: aNode [
 
-	"Faster than FASTTEntity>>parentNode."
+	"Faster than FASTTEntity>>#parentNode."
 
-	^ self
-		  parentOf: aNode
-		  nodeAndRelationDo: [ :parent :relation | parent ]
+	^ self parentOf: aNode withRelationDo: [ :parent :relation | parent ]
 ]
 
 { #category : #enumerating }
-FASTRefactor >> parentOf: aNode nodeAndRelationDo: aBlock [
+FASTRefactor >> parentOf: aNode withRelationDo: aBlock [
 
 	"Evaluate a block with the parent node and aNode's relation to it as arguments.
 	Stop at first found because there is only one parent in a tree."
 
 	(self propertiesOf: aNode) do: [ :property | 
-		property isContainer and: [ 
+		property isContainer ifTrue: [ 
 			(aNode perform: property implementingSelector) ifNotNil: [ :parent | 
 				^ aBlock value: parent value: property ] ] ].
 	^ nil
+]
+
+{ #category : #'private - copying' }
+FASTRefactor >> privateCopy: aNode [
+
+	^ aNode class new mooseModel: aNode mooseModel
 ]
 
 { #category : #enumerating }
@@ -210,7 +224,7 @@ FASTRefactor >> removeTree: aNode [
 
 	"Recursively remove a node and all its children from the model."
 
-	self childrenOf: aNode nodeAndRelationDo: [ :child :relation | 
+	self childrenOf: aNode withRelationDo: [ :child :relation | 
 		child isCollection
 			ifTrue: [ 
 				child ifNotEmpty: [ "make an array copy to remove elements during iteration" 
@@ -224,7 +238,7 @@ FASTRefactor >> replace: aNode with: newNode [
 
 	"Replace a node with a new one in the same location."
 
-	self parentOf: aNode nodeAndRelationDo: [ :parent :relation | 
+	self parentOf: aNode withRelationDo: [ :parent :relation | 
 		relation opposite isMultivalued
 			ifTrue: [ "replace at same index"
 				(parent perform: relation opposite implementingSelector)
