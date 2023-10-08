@@ -128,15 +128,14 @@ FASTRefactor >> inlineLiteralsIn: aFASTTBehaviouralEntity [
 ]
 
 { #category : #testing }
-FASTRefactor >> isRedundantSetter: invoc [
+FASTRefactor >> isRedundantSetter: invocation [
 
 	"Setting a value which is equals to the default value is redundant."
 
 	| argument |
-	^ invoc arguments size = 1 and: [ 
-		  (argument := invoc arguments first) isLiteral and: [ 
-			  argument isDefaultValue and: [ 
-				  invoc famixInvocation anyCandidate isSetter ] ] ]
+	^ invocation arguments size = 1 and: [ 
+		  (argument := invocation arguments first) isLiteral and: [ 
+			  argument isDefaultValue and: [ invocation famixMethod isSetter ] ] ]
 ]
 
 { #category : #accessing }

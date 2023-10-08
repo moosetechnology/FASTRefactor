@@ -33,8 +33,7 @@ FASTRJava >> isRedundantSetter: invoc [
 	| argument |
 	^ (super isRedundantSetter: invoc) and: [ 
 		  (argument := invoc arguments first) isNullLiteral or: [ 
-			  invoc famixInvocation anyCandidate parameters first declaredType
-				  isPrimitiveType ] ]
+			  invoc famixMethod parameters first declaredType isPrimitiveType ] ]
 ]
 
 { #category : #'ast transformation' }
