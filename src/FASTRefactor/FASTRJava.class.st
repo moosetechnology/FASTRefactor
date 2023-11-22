@@ -27,12 +27,10 @@ FASTRJava >> inlineLiteralsIn: aFASTJavaMethodEntity [
 
 { #category : #testing }
 FASTRJava >> isRedundantSetter: invoc [
-
 	"Objects such as Integer, Long, Float, etc. can be initialized with a literal, but their default value is null."
 
-	| argument |
-	^ (super isRedundantSetter: invoc) and: [ 
-		  (argument := invoc arguments first) isNullLiteral or: [ 
+	^ (super isRedundantSetter: invoc) and: [
+		  invoc arguments first isNullLiteral or: [
 			  invoc famixMethod parameters first declaredType isPrimitiveType ] ]
 ]
 
