@@ -29,11 +29,11 @@ FASTRefactorTest >> setUp [
 	varDeclStatement := model newVarDeclStatement declarators:
 		                    { varDecl }.
 	varExpr := model newVariableExpression.
-	invocation := model newMethodInvocation arguments: { 
+	invocation := model newMethodInvocation arguments: {
 			              varExpr.
 			              model newNullLiteral }.
 	method := model newMethodEntity statementBlock:
-		          (model newStatementBlock statements: { 
+		          (model newStatementBlock statements: {
 				           varDeclStatement.
 				           (model newExpressionStatement expression: invocation) })
 ]
@@ -70,16 +70,16 @@ FASTRefactorTest >> testAddBefore [
 FASTRefactorTest >> testCopyLeaf [
 
 	| copy value |
-	{ literal. varExpr } do: [ :node | 
+	{ literal. varExpr } do: [ :node |
 		copy := refactor copyLeaf: node.
 		self assert: copy class equals: node class.
 		self deny: copy equals: node.
-		(refactor propertiesOf: copy) do: [ :property | 
-			(property mmClass package name beginsWith: 'FAST') ifTrue: [ 
+		(refactor propertiesOf: copy) do: [ :property |
+			(property mmClass package name beginsWith: 'FAST') ifTrue: [
 				value := copy perform: property implementingSelector.
 				property hasOpposite
 					ifTrue: [ self assert: value isEmptyOrNil ]
-					ifFalse: [ 
+					ifFalse: [
 						self
 							assert: value
 							equals: (node perform: property implementingSelector) ] ] ] ]
@@ -87,7 +87,6 @@ FASTRefactorTest >> testCopyLeaf [
 
 { #category : #tests }
 FASTRefactorTest >> testRemoveNode [
-
 	"Once a node is removed, verify that:
 	- model does not include it anymore
 	- only one node is removed from the model
@@ -101,8 +100,8 @@ FASTRefactorTest >> testRemoveNode [
 	self deny: (model includes: literal).
 	self assert: model size equals: size - 1.
 	self assert:
-		((literal allDeclaredProperties select: #hasOpposite) allSatisfy: [ 
-			 :relation | 
+		((literal allDeclaredProperties select: #hasOpposite) allSatisfy: [
+			 :relation |
 			 (literal perform: relation implementingSelector) isEmptyOrNil ]).
 
 	"Can remove entity in a multivalued slot"
@@ -110,8 +109,8 @@ FASTRefactorTest >> testRemoveNode [
 	self deny: (model includes: varExpr).
 	self assert: model size equals: size - 2.
 	self assert:
-		((varExpr allDeclaredProperties select: #hasOpposite) allSatisfy: [ 
-			 :relation | 
+		((varExpr allDeclaredProperties select: #hasOpposite) allSatisfy: [
+			 :relation |
 			 (varExpr perform: relation implementingSelector) isEmptyOrNil ])
 ]
 

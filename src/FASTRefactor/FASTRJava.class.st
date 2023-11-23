@@ -14,9 +14,9 @@ FASTRJava >> inlineLiteralsIn: aFASTJavaMethodEntity [
 	varExprs := (aFASTJavaMethodEntity toScope: FASTTVariableExpression)
 		            asArray.
 	(aFASTJavaMethodEntity toScope: FASTJavaVariableDeclarator)
-		select: [ :decl | "select vars initialized with a literal" 
+		select: [ :decl | "select vars initialized with a literal"
 			(expr := decl expression) isNotNil and: [ expr isLiteral ] ]
-		thenDo: [ :decl | 
+		thenDo: [ :decl |
 			| variable name |
 			name := (variable := decl variable) name.
 			varExprs
@@ -36,13 +36,12 @@ FASTRJava >> isRedundantSetter: invoc [
 
 { #category : #'ast transformation' }
 FASTRJava >> removeVariableDeclaration: aFASTJavaVariableDeclarator [
-
 	"Remove a variable declarator from the AST.
 	If the containing declaration statement is then empty, it is also removed."
 
 	| aFASTJavaVarDeclStatement |
 	aFASTJavaVarDeclStatement := aFASTJavaVariableDeclarator varDeclOwner.
 	self removeNode: aFASTJavaVariableDeclarator.
-	aFASTJavaVarDeclStatement declarators ifEmpty: [ 
+	aFASTJavaVarDeclStatement declarators ifEmpty: [
 		self removeNode: aFASTJavaVarDeclStatement ]
 ]

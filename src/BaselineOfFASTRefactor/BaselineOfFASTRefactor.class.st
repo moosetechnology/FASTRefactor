@@ -8,7 +8,7 @@ Class {
 BaselineOfFASTRefactor >> baseline: spec [
 
 	<baseline>
-	spec for: #common do: [ 
+	spec for: #common do: [
 		self dependencies: spec.
 		self packages: spec.
 		self groups: spec ]
@@ -17,7 +17,7 @@ BaselineOfFASTRefactor >> baseline: spec [
 { #category : #baselines }
 BaselineOfFASTRefactor >> dependencies: spec [
 
-	spec baseline: 'FASTJava' with: [ "transitively loads FAST" 
+	spec baseline: 'FASTJava' with: [ "transitively loads FAST"
 		spec repository: 'github://moosetechnology/FAST-JAVA:v3/src' ]
 ]
 

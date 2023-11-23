@@ -22,7 +22,7 @@ FASTRJavaTest >> testInlineLiteralsIn [
 
 	refactor inlineLiteralsIn: method.
 	self assert: invocation arguments first isLiteral.
-	self denyCollection: model includesAny: { 
+	self denyCollection: model includesAny: {
 			varDeclStatement.
 			varDecl }
 ]
