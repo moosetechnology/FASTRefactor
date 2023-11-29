@@ -164,7 +164,7 @@ FASTRefactor >> parentOf: aNode withRelationDo: aBlock [
 { #category : #'private - copying' }
 FASTRefactor >> privateCopy: aNode [
 
-	^ aNode class new mooseModel: aNode mooseModel
+	^ aNode class new mooseModel: model
 ]
 
 { #category : #enumerating }
