@@ -223,7 +223,9 @@ FASTRefactor >> replace: aNode with: newNode [
 	"Replace a node with a new one in the same location."
 
 	self parentOf: aNode withRelationDo: [ :parent :relation |
-		relation opposite isMultivalued
+		(relation opposite isMultivalued or: [ "temporary check until https://github.com/moosetechnology/FAST-JAVA/issues/210 is fixed"
+			 (parent perform: relation opposite implementingSelector)
+				 isKindOf: FMMultivalueLink ])
 			ifTrue: [ "replace at same index"
 				(parent perform: relation opposite implementingSelector)
 					replace: aNode
