@@ -4,8 +4,8 @@ Extension { #name : #FMMultivalueLink }
 FMMultivalueLink >> replace: oldEntity with: newEntity [
 
 	| index |
-	index := values indexOf: oldEntity.
+	index := self indexOf: oldEntity.
 	oldEntity perform: opposite with: nil.
 	newEntity perform: opposite with: owner.
-	values add: values removeLast beforeIndex: index
+	self add: self removeLast beforeIndex: index
 ]
