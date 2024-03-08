@@ -1,17 +1,13 @@
 Extension { #name : #FMSlotMultivalueLink }
 
 { #category : #'*FASTRefactor' }
-FMSlotMultivalueLink >> add: newEntity after: entity [
+FMSlotMultivalueLink >> insert: anElement before: spot [
+	"Enables #add:after:, #add:before:, #add:beforeIndex: and #add:afterIndex:"
 
-	slot add: newEntity to: owner.
-	super add: newEntity after: entity
-]
-
-{ #category : #'*FASTRefactor' }
-FMSlotMultivalueLink >> add: newEntity before: entity [
-
-	slot add: newEntity to: owner.
-	super add: newEntity before: entity
+	slot add: anElement to: owner.
+	(self includes: anElement) ifFalse: [
+		super insert: anElement before: spot ].
+	^ anElement
 ]
 
 { #category : #'*FASTRefactor' }

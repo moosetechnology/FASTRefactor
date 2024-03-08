@@ -61,29 +61,9 @@ FASTRefactor >> childrenOf: aNode withRelationDo: aBlock [
 ]
 
 { #category : #copying }
-FASTRefactor >> copyLeaf: aNode [
-	"Return a copy of aNode with a new ID and properly added to its model.
-	Do not implement the `postCopy` hook because we are dealing with tree structures, so this is not generalizable to all models in the Famix framework."
+FASTRefactor >> copyChildrenOf: aNode to: newNode [
+	"Copy the children of a node to another."
 
-	| newNode |
-	newNode := self privateCopy: aNode.
-	(self propertiesOf: aNode)
-		select: [ :property |
-		property isDerived not and: [ property opposite isNil ] ]
-		thenDo: [ :property |
-			(aNode perform: property implementingSelector) ifNotNil: [ :value |
-				newNode
-					perform: property implementingSelector asMutator
-					with: value copy ] ].
-	^ newNode
-]
-
-{ #category : #copying }
-FASTRefactor >> copyTree: aNode [
-	"Copy aNode and all its children recursively."
-
-	| newNode |
-	newNode := self privateCopy: aNode.
 	self childrenOf: aNode withRelationDo: [ :child :relation |
 		child isCollection
 			ifTrue: [
@@ -94,7 +74,41 @@ FASTRefactor >> copyTree: aNode [
 			ifFalse: [
 				newNode
 					perform: relation implementingSelector asMutator
-					with: (self copyTree: child) ] ].
+					with: (self copyTree: child) ] ]
+]
+
+{ #category : #copying }
+FASTRefactor >> copyLeaf: aNode [
+	"Copy a node with all of its properties. Children, if any, are ignored."
+
+	| newNode |
+	newNode := self privateCopy: aNode.
+	self copyPropertiesOf: aNode to: newNode.
+	^ newNode
+]
+
+{ #category : #copying }
+FASTRefactor >> copyPropertiesOf: aNode to: newNode [
+	"Copy the properties of a node to another (the ones from the generator's `defineProperties` method)."
+
+	(self propertiesOf: aNode)
+		select: [ :property |
+		property isDerived not and: [ property opposite isNil ] ]
+		thenDo: [ :property |
+			(aNode perform: property implementingSelector) ifNotNil: [ :value |
+				newNode
+					perform: property implementingSelector asMutator
+					with: value copy ] ]
+]
+
+{ #category : #copying }
+FASTRefactor >> copyTree: aNode [
+	"Copy a node and all its children recursively."
+
+	| newNode |
+	newNode := self privateCopy: aNode.
+	self copyPropertiesOf: aNode to: newNode.
+	self copyChildrenOf: aNode to: newNode.
 	^ newNode
 ]
 
@@ -163,6 +177,8 @@ FASTRefactor >> parentOf: aNode withRelationDo: aBlock [
 
 { #category : #'private - copying' }
 FASTRefactor >> privateCopy: aNode [
+	"Return a copy of aNode with a new ID and properly added to its model.
+	Do not implement the `postCopy` hook because we are dealing with tree structures, so this is not generalizable to all models in the Famix framework."
 
 	^ aNode class new mooseModel: model
 ]

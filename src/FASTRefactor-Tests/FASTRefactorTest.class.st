@@ -24,7 +24,7 @@ FASTRefactorTest >> setUp [
 	refactor := FASTRefactor on: (model := FASTJavaModel new).
 
 	"void f() { int var = 42; g(var, null); }"
-	literal := model newIntegerLiteral.
+	literal := model newIntegerLiteral primitiveValue: '42'.
 	varDecl := model newVariableDeclarator expression: literal.
 	varDeclStatement := model newVarDeclStatement declarators:
 		                    { varDecl }.
@@ -72,6 +72,25 @@ FASTRefactorTest >> testCopyLeaf [
 	| copy value |
 	{ literal. varExpr } do: [ :node |
 		copy := refactor copyLeaf: node.
+		self assert: copy class equals: node class.
+		self deny: copy equals: node.
+		(refactor propertiesOf: copy) do: [ :property |
+			(property mmClass package name beginsWith: 'FAST') ifTrue: [
+				value := copy perform: property implementingSelector.
+				property hasOpposite
+					ifTrue: [ self assert: value isEmptyOrNil ]
+					ifFalse: [
+						self
+							assert: value
+							equals: (node perform: property implementingSelector) ] ] ] ]
+]
+
+{ #category : #tests }
+FASTRefactorTest >> testCopyTree [
+
+	| copy value |
+	{ literal. varExpr } do: [ :node |
+		copy := refactor copyTree: node.
 		self assert: copy class equals: node class.
 		self deny: copy equals: node.
 		(refactor propertiesOf: copy) do: [ :property |
