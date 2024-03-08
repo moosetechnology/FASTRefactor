@@ -15,13 +15,15 @@ FASTRJava >> inlineLiteralsIn: aFASTJavaMethodEntity [
 		            asArray.
 	(aFASTJavaMethodEntity toScope: FASTJavaVariableDeclarator)
 		select: [ :decl | "select vars initialized with a literal"
-			(expr := decl expression) isNotNil and: [ expr isLiteral ] ]
+			(expr := decl expression) isNotNil and: [
+				expr isLiteral or: [ "or with a class property (enum or static field)"
+					expr class == FASTJavaClassProperty ] ] ]
 		thenDo: [ :decl |
 			| variable name |
 			name := (variable := decl variable) name.
 			varExprs
 				select: [ :var | var ~~ variable and: [ var name = name ] ]
-				thenDo: [ :var | self replace: var with: (self copyLeaf: expr) ].
+				thenDo: [ :var | self replace: var with: (self copyTree: expr) ].
 			self removeVariableDeclaration: decl ]
 ]
 
