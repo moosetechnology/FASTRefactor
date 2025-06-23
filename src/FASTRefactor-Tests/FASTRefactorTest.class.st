@@ -2,8 +2,8 @@
 A FASTRefactorTest is a test class for testing the behavior of FASTRefactor
 "
 Class {
-	#name : #FASTRefactorTest,
-	#superclass : #TestCase,
+	#name : 'FASTRefactorTest',
+	#superclass : 'TestCase',
 	#instVars : [
 		'literal',
 		'varDecl',
@@ -14,14 +14,22 @@ Class {
 		'varExpr',
 		'invocation'
 	],
-	#category : #'FASTRefactor-Tests'
+	#category : 'FASTRefactor-Tests',
+	#package : 'FASTRefactor-Tests'
 }
 
-{ #category : #running }
+{ #category : 'accessing' }
+FASTRefactorTest >> refactorClass [
+
+	^ FASTRefactor
+]
+
+{ #category : 'running' }
 FASTRefactorTest >> setUp [
 
 	super setUp.
-	refactor := FASTRefactor on: (model := FASTJavaModel new).
+	refactor := self refactorClass on: (model := FASTJavaModel new).
+	refactor removeFromModel: true.
 
 	"void f() { int var = 42; g(var, null); }"
 	literal := model newIntegerLiteral primitiveValue: '42'.
@@ -38,7 +46,7 @@ FASTRefactorTest >> setUp [
 				           (model newExpressionStatement expression: invocation) })
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 FASTRefactorTest >> testAddAfter [
 
 	| newNode |
@@ -52,7 +60,7 @@ FASTRefactorTest >> testAddAfter [
 	self assert: invocation arguments size equals: 3
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 FASTRefactorTest >> testAddBefore [
 
 	| newNode |
@@ -66,7 +74,7 @@ FASTRefactorTest >> testAddBefore [
 	self assert: invocation arguments size equals: 3
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 FASTRefactorTest >> testCopyLeaf [
 
 	| copy value |
@@ -85,7 +93,7 @@ FASTRefactorTest >> testCopyLeaf [
 							equals: (node perform: property implementingSelector) ] ] ] ]
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 FASTRefactorTest >> testCopyTree [
 
 	| copy value |
@@ -104,7 +112,7 @@ FASTRefactorTest >> testCopyTree [
 							equals: (node perform: property implementingSelector) ] ] ] ]
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 FASTRefactorTest >> testRemoveNode [
 	"Once a node is removed, verify that:
 	- model does not include it anymore
@@ -133,7 +141,7 @@ FASTRefactorTest >> testRemoveNode [
 			 (varExpr perform: relation implementingSelector) isEmptyOrNil ])
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 FASTRefactorTest >> testRemoveTree [
 
 	refactor removeTree: method.
@@ -141,7 +149,7 @@ FASTRefactorTest >> testRemoveTree [
 	self assertEmpty: model
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 FASTRefactorTest >> testReplaceWith [
 
 	| newNode |

@@ -1,1 +1,1 @@
-Package { #name : #'FASTRefactor-Tests' }
+Package { #name : 'FASTRefactor-Tests' }
