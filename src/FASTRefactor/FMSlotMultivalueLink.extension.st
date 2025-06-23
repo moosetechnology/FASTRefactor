@@ -1,6 +1,6 @@
-Extension { #name : #FMSlotMultivalueLink }
+Extension { #name : 'FMSlotMultivalueLink' }
 
-{ #category : #'*FASTRefactor' }
+{ #category : '*FASTRefactor' }
 FMSlotMultivalueLink >> insert: anElement before: spot [
 	"Enables #add:after:, #add:before:, #add:beforeIndex: and #add:afterIndex:"
 
@@ -10,7 +10,7 @@ FMSlotMultivalueLink >> insert: anElement before: spot [
 	^ anElement
 ]
 
-{ #category : #'*FASTRefactor' }
+{ #category : '*FASTRefactor' }
 FMSlotMultivalueLink >> replace: oldEntity with: newEntity [
 
 	slot remove: oldEntity from: owner.

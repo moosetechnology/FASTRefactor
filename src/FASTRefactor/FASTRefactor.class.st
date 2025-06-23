@@ -13,22 +13,24 @@ FASTRefactor is based on the FAST metamodel, which is optimized for AST represen
 Optimization is prioritized over syntactic sugar to improve performance.
 "
 Class {
-	#name : #FASTRefactor,
-	#superclass : #Object,
+	#name : 'FASTRefactor',
+	#superclass : 'Object',
 	#instVars : [
 		'model',
-		'propertyCache'
+		'propertyCache',
+		'removeFromModel'
 	],
-	#category : #FASTRefactor
+	#category : 'FASTRefactor',
+	#package : 'FASTRefactor'
 }
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 FASTRefactor class >> on: aFASTModel [
 
 	^ self new model: aFASTModel
 ]
 
-{ #category : #'ast manipulation' }
+{ #category : 'ast manipulation' }
 FASTRefactor >> add: newNode after: aNode [
 	"Add newNode after aNode in the parent container of aNode.
 	Fail if aNode is not in a to-many relationship with its parent."
@@ -39,7 +41,7 @@ FASTRefactor >> add: newNode after: aNode [
 			after: aNode ]
 ]
 
-{ #category : #'ast manipulation' }
+{ #category : 'ast manipulation' }
 FASTRefactor >> add: newNode before: aNode [
 	"Add newNode before aNode in the parent container of aNode.
 	Fail if aNode is not in a to-many relationship with its parent."
@@ -50,7 +52,7 @@ FASTRefactor >> add: newNode before: aNode [
 			before: aNode ]
 ]
 
-{ #category : #enumerating }
+{ #category : 'enumerating' }
 FASTRefactor >> childrenOf: aNode withRelationDo: aBlock [
 	"Evaluate a block with each child node and aNode's relation to it as arguments."
 
@@ -60,7 +62,7 @@ FASTRefactor >> childrenOf: aNode withRelationDo: aBlock [
 				aBlock value: child value: property ] ] ]
 ]
 
-{ #category : #copying }
+{ #category : 'copying' }
 FASTRefactor >> copyChildrenOf: aNode to: newNode [
 	"Copy the children of a node to another."
 
@@ -77,7 +79,7 @@ FASTRefactor >> copyChildrenOf: aNode to: newNode [
 					with: (self copyTree: child) ] ]
 ]
 
-{ #category : #copying }
+{ #category : 'copying' }
 FASTRefactor >> copyLeaf: aNode [
 	"Copy a node with all of its properties. Children, if any, are ignored."
 
@@ -87,7 +89,7 @@ FASTRefactor >> copyLeaf: aNode [
 	^ newNode
 ]
 
-{ #category : #copying }
+{ #category : 'copying' }
 FASTRefactor >> copyPropertiesOf: aNode to: newNode [
 	"Copy the properties of a node to another (the ones from the generator's `defineProperties` method)."
 
@@ -101,7 +103,7 @@ FASTRefactor >> copyPropertiesOf: aNode to: newNode [
 					with: value copy ] ]
 ]
 
-{ #category : #copying }
+{ #category : 'copying' }
 FASTRefactor >> copyTree: aNode [
 	"Copy a node and all its children recursively."
 
@@ -112,21 +114,22 @@ FASTRefactor >> copyTree: aNode [
 	^ newNode
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 FASTRefactor >> initialize [
 
 	propertyCache := Dictionary new
 ]
 
-{ #category : #'ast transformation' }
+{ #category : 'ast transformation' }
 FASTRefactor >> inlineLiterals [
 	"Inline all variables holding literal values in the model."
 
+	'Inlining literals...' record.
 	(model allUsing: FASTTBehaviouralEntity) do: [ :entity |
 		self inlineLiteralsIn: entity ]
 ]
 
-{ #category : #'ast transformation' }
+{ #category : 'ast transformation' }
 FASTRefactor >> inlineLiteralsIn: aFASTTBehaviouralEntity [
 	"Replace variables initialized with a literal with the latter.
 	Java example: `int i = 0; f(i);` -> `f(0);`"
@@ -134,7 +137,7 @@ FASTRefactor >> inlineLiteralsIn: aFASTTBehaviouralEntity [
 	self subclassResponsibility
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 FASTRefactor >> isRedundantSetter: invocation [
 	"Setting a value which is equals to the default value is redundant."
 
@@ -146,26 +149,26 @@ FASTRefactor >> isRedundantSetter: invocation [
 					  method isSetter ] ] ] ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 FASTRefactor >> model [
 
 	^ model
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 FASTRefactor >> model: aFASTModel [
 
 	model := aFASTModel
 ]
 
-{ #category : #enumerating }
+{ #category : 'enumerating' }
 FASTRefactor >> parentNodeOf: aNode [
 	"Faster than FASTTEntity>>#parentNode."
 
 	^ self parentOf: aNode withRelationDo: [ :parent :relation | parent ]
 ]
 
-{ #category : #enumerating }
+{ #category : 'enumerating' }
 FASTRefactor >> parentOf: aNode withRelationDo: aBlock [
 	"Evaluate a block with the parent node and aNode's relation to it as arguments.
 	Stop at first found because there is only one parent in a tree."
@@ -177,7 +180,7 @@ FASTRefactor >> parentOf: aNode withRelationDo: aBlock [
 	^ nil
 ]
 
-{ #category : #'private - copying' }
+{ #category : 'private - copying' }
 FASTRefactor >> privateCopy: aNode [
 	"Return a copy of aNode with a new ID and properly added to its model.
 	Do not implement the `postCopy` hook because we are dealing with tree structures, so this is not generalizable to all models in the Famix framework."
@@ -185,7 +188,7 @@ FASTRefactor >> privateCopy: aNode [
 	^ aNode class new mooseModel: model
 ]
 
-{ #category : #enumerating }
+{ #category : 'enumerating' }
 FASTRefactor >> propertiesOf: aNode [
 	"Iterate over the properties of aNode in a metamodel-agnostic manner.
 	Properties include both direct properties (attributes) and relationships.
@@ -196,7 +199,7 @@ FASTRefactor >> propertiesOf: aNode [
 		  ifAbsentPut: [ aNode allDeclaredProperties ]
 ]
 
-{ #category : #'ast manipulation' }
+{ #category : 'ast manipulation' }
 FASTRefactor >> removeNode: aNode [
 	"Completely remove a node from its model and relations."
 
@@ -212,18 +215,19 @@ FASTRefactor >> removeNode: aNode [
 	model ifNotNil: [ model remove: aNode ]
 ]
 
-{ #category : #'ast transformation' }
+{ #category : 'ast transformation' }
 FASTRefactor >> removeRedundantSetters [
 	"Uninitialized variables have a default value, so it is redundant to use a setter with the default value as an argument.
 	To work correctly, the invocations should be bound to the called method in a Famix model."
 
+	'Removing redundant setters...' record.
 	(model allUsing: FASTTInvocation)
 		select: [ :invoc | self isRedundantSetter: invoc ]
 		thenDo: [ :invoc | "Remove the statement containing the setter expression."
 			self removeTree: (self parentNodeOf: invoc) ]
 ]
 
-{ #category : #'ast manipulation' }
+{ #category : 'ast manipulation' }
 FASTRefactor >> removeTree: aNode [
 	"Recursively remove a node and all its children from the model."
 
@@ -236,7 +240,7 @@ FASTRefactor >> removeTree: aNode [
 	self removeNode: aNode
 ]
 
-{ #category : #'ast manipulation' }
+{ #category : 'ast manipulation' }
 FASTRefactor >> replace: aNode with: newNode [
 	"Replace a node with a new one in the same location."
 

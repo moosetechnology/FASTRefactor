@@ -2,12 +2,13 @@
 I specialize in refactoring Java-specific AST structures.
 "
 Class {
-	#name : #FASTRJava,
-	#superclass : #FASTRefactor,
-	#category : #FASTRefactor
+	#name : 'FASTRJava',
+	#superclass : 'FASTRefactor',
+	#category : 'FASTRefactor',
+	#package : 'FASTRefactor'
 }
 
-{ #category : #'ast transformation' }
+{ #category : 'ast transformation' }
 FASTRJava >> inlineLiteralsIn: aFASTJavaMethodEntity [
 
 	| varExprs expr |
@@ -27,7 +28,7 @@ FASTRJava >> inlineLiteralsIn: aFASTJavaMethodEntity [
 			self removeVariableDeclaration: decl ]
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 FASTRJava >> isRedundantSetter: invoc [
 	"Objects such as Integer, Long, Float, etc. can be initialized with a literal, but their default value is null."
 
@@ -36,7 +37,7 @@ FASTRJava >> isRedundantSetter: invoc [
 			  invoc famixMethod parameters first declaredType isPrimitiveType ] ]
 ]
 
-{ #category : #'ast transformation' }
+{ #category : 'ast transformation' }
 FASTRJava >> removeVariableDeclaration: aFASTJavaVariableDeclarator [
 	"Remove a variable declarator from the AST.
 	If the containing declaration statement is then empty, it is also removed."

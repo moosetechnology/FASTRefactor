@@ -1,1 +1,1 @@
-Package { #name : #FASTRefactor }
+Package { #name : 'FASTRefactor' }

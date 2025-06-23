@@ -1,6 +1,6 @@
-Extension { #name : #FASTJavaIntegerLiteral }
+Extension { #name : 'FASTJavaIntegerLiteral' }
 
-{ #category : #'*FASTRefactor' }
+{ #category : '*FASTRefactor' }
 FASTJavaIntegerLiteral >> isDefaultValue [
 
 	^ primitiveValue asNumber isZero

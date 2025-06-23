@@ -1,12 +1,12 @@
-Extension { #name : #FASTTLiteral }
+Extension { #name : 'FASTTLiteral' }
 
-{ #category : #'*FASTRefactor' }
+{ #category : '*FASTRefactor' }
 FASTTLiteral >> isDefaultValue [
 
 	^ false
 ]
 
-{ #category : #'*FASTRefactor' }
+{ #category : '*FASTRefactor' }
 FASTTLiteral >> isLiteral [
 
 	^ true

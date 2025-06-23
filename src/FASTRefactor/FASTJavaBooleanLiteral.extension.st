@@ -1,6 +1,6 @@
-Extension { #name : #FASTJavaBooleanLiteral }
+Extension { #name : 'FASTJavaBooleanLiteral' }
 
-{ #category : #'*FASTRefactor' }
+{ #category : '*FASTRefactor' }
 FASTJavaBooleanLiteral >> isDefaultValue [
 
 	^ primitiveValue = 'false'

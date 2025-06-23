@@ -1,6 +1,6 @@
-Extension { #name : #FASTJavaLongLiteral }
+Extension { #name : 'FASTJavaLongLiteral' }
 
-{ #category : #'*FASTRefactor' }
+{ #category : '*FASTRefactor' }
 FASTJavaLongLiteral >> isDefaultValue [
 
 	^ primitiveValue asNumber isZero

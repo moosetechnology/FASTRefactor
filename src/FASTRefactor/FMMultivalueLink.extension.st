@@ -1,6 +1,6 @@
-Extension { #name : #FMMultivalueLink }
+Extension { #name : 'FMMultivalueLink' }
 
-{ #category : #'*FASTRefactor' }
+{ #category : '*FASTRefactor' }
 FMMultivalueLink >> replace: oldEntity with: newEntity [
 
 	| index |

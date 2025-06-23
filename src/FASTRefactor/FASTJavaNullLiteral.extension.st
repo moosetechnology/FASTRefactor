@@ -1,12 +1,12 @@
-Extension { #name : #FASTJavaNullLiteral }
+Extension { #name : 'FASTJavaNullLiteral' }
 
-{ #category : #'*FASTRefactor' }
+{ #category : '*FASTRefactor' }
 FASTJavaNullLiteral >> isDefaultValue [
 
 	^ true
 ]
 
-{ #category : #'*FASTRefactor' }
+{ #category : '*FASTRefactor' }
 FASTJavaNullLiteral >> isNullLiteral [
 
 	^ true

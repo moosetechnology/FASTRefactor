@@ -1,6 +1,6 @@
-Extension { #name : #FASTJavaEntity }
+Extension { #name : 'FASTJavaEntity' }
 
-{ #category : #'*FASTRefactor' }
+{ #category : '*FASTRefactor' }
 FASTJavaEntity >> isNullLiteral [
 
 	^ false
