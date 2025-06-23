@@ -117,7 +117,8 @@ FASTRefactor >> copyTree: aNode [
 { #category : 'initialization' }
 FASTRefactor >> initialize [
 
-	propertyCache := Dictionary new
+	propertyCache := Dictionary new.
+	removeFromModel := false
 ]
 
 { #category : 'ast transformation' }
@@ -199,9 +200,23 @@ FASTRefactor >> propertiesOf: aNode [
 		  ifAbsentPut: [ aNode allDeclaredProperties ]
 ]
 
+{ #category : 'accessing' }
+FASTRefactor >> removeFromModel [
+
+	^ removeFromModel
+]
+
+{ #category : 'accessing' }
+FASTRefactor >> removeFromModel: aBoolean [
+	"Whether to remove nodes from the model when refactoring.
+	Depending on the size of the model, this operation can be expensive."
+
+	removeFromModel := aBoolean
+]
+
 { #category : 'ast manipulation' }
 FASTRefactor >> removeNode: aNode [
-	"Completely remove a node from its model and relations."
+	"Completely remove a node from its relations (and model if configured)."
 
 	(self propertiesOf: aNode)
 		select: [ :relation | relation hasOpposite ]
@@ -212,7 +227,8 @@ FASTRefactor >> removeNode: aNode [
 					with: (relation isMultivalued
 							 ifTrue: [ #(  ) ]
 							 ifFalse: [ nil ]) ] ].
-	model ifNotNil: [ model remove: aNode ]
+	(removeFromModel and: [ model isNotNil ]) ifTrue: [
+		model remove: aNode ]
 ]
 
 { #category : 'ast transformation' }
